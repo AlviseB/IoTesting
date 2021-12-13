@@ -108,8 +108,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocols\Http.cs" />
     <Compile Include="Protocols\ProtocolInterface.cs" />
+    <Compile Include="Sensors\AltitudeSensorInterface.cs" />
+    <Compile Include="Sensors\GPSSensorInterface.cs" />
     <Compile Include="Sensors\SpeedSensorInterface.cs" />
     <Compile Include="Sensors\SensorInterface.cs" />
+    <Compile Include="Sensors\VirtualAltitudeSensor.cs" />
+    <Compile Include="Sensors\VirtualGPSSensor.cs" />
     <Compile Include="Sensors\VirtualSpeedSensor.cs" />
   </ItemGroup>
   <ItemGroup>
