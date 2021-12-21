@@ -33,7 +33,7 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   - **noleggi**, contiene dati sui noleggi (id dell'utente e del drone noleggiato, data di noleggio, durata, ecc. ecc.)
   - **storico dei dati raccolti**, contiene lo storico dei dati inviati dai droni (e id del drone)
 
-  ### Endpoints
+  ### Endpoints HTTP
   `GET /drones` Restituisce tutti i droni con i relativi dati aggiornati
   
   `GET /drones/:ID` Restituisce i dati più recenti dei sensori del drone identificato dal parametro *ID*
@@ -43,3 +43,6 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   `GET /drones/:ID/action` Restituisce la prossima azione da eseguire per il drone identificato da *ID*
   
   `POST /drones/:ID/action` Inserisce in coda un'azione da eseguire per il drone identificato da *ID*
+  
+  ### Topic MQTT
+  `IoTesting/dr1_42/speed`, ovvero progetto/ID_Drone/sensore
