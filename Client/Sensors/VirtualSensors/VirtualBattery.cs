@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Client.Sensors
 {
-    class VirtualBattery
+    class VirtualBattery : SensorInterface, BatteryInterface
     {
         public string toJson()
         {
