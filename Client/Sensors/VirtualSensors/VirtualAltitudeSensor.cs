@@ -16,7 +16,7 @@ namespace Client.Sensors
         public int GetAltitude()
         {
             var random = new Random();
-            return random.Next(100);
+            return random.Next(2000);
         }
     }
 }
