@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Client.Sensors
 {
-    class VirtualAltitudeSensor : AltitudeSensorInterface, SensorInterface
+    class VirtualBattery
     {
         public string toJson()
         {
-            return "\"altitude\": " + GetAltitude();
+            return "\"battery\": " + GetBattery();
         }
-
-        public int GetAltitude()
+        public int GetBattery()
         {
             var random = new Random();
             return random.Next(100);

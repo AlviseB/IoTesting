@@ -23,15 +23,20 @@ namespace Client
             // send data to server
             while (true)
             {
+                String json = "{";
+                bool firstLoop = true;
                 foreach (SensorInterface sensor in sensors)
                 {
-                    //protocol.Send(sensor.toJson());
-
-                    Console.WriteLine("Data sent: " + sensor.toJson());
-
-                    System.Threading.Thread.Sleep(1000);
+                    if (!firstLoop)
+                        json += ", ";
+                    firstLoop = false;
+                    string json_sensor = sensor.toJson();
+                    json += json_sensor;
                 }
-
+                json += '}';
+                //protocol.Send(json);
+                Console.WriteLine("Data sent: " + json);
+                System.Threading.Thread.Sleep(1000);
             }
 
         }

@@ -10,7 +10,7 @@ namespace Client.Sensors
     {
         public string toJson()
         {
-            return "{\"latitude\": " + GetLatitude() + ", \"longitude\": " + GetLongitude() + "}";
+            return "gps: {\"latitude\": " + GetLatitude() + ", \"longitude\": " + GetLongitude() + "}";
         }
 
         public double GetLatitude()

@@ -109,11 +109,15 @@
     <Compile Include="Protocols\Http.cs" />
     <Compile Include="Protocols\ProtocolInterface.cs" />
     <Compile Include="Sensors\AltitudeSensorInterface.cs" />
+    <Compile Include="Sensors\BatteryInterface.cs" />
     <Compile Include="Sensors\GPSSensorInterface.cs" />
+    <Compile Include="Sensors\OrientationInterface.cs" />
     <Compile Include="Sensors\SpeedSensorInterface.cs" />
     <Compile Include="Sensors\SensorInterface.cs" />
     <Compile Include="Sensors\VirtualAltitudeSensor.cs" />
+    <Compile Include="Sensors\VirtualBattery.cs" />
     <Compile Include="Sensors\VirtualGPSSensor.cs" />
+    <Compile Include="Sensors\VirtualOrientation.cs" />
     <Compile Include="Sensors\VirtualSpeedSensor.cs" />
   </ItemGroup>
   <ItemGroup>

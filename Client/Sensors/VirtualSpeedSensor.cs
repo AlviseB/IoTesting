@@ -10,13 +10,13 @@ namespace Client.Sensors
     {
         public string toJson()
         {
-            return "{\"speed\": " + GetSpeed() + "}";
+            return "\"speed\": " + GetSpeed();
         }
 
         public int GetSpeed()
         {
             var random = new Random();
-            return random.Next(100);
+            return random.Next(150);
         }
     }
 }
