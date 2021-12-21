@@ -10,8 +10,13 @@ namespace Client.Drone
 {
     class SensorsSender
     {
-        static public void doWork(object droneID)
+        static public void doWork(object parameters)
         {
+            //extract id and protocols from dictionary
+            Dictionary<string, object> dict = (Dictionary<string, object>)parameters;
+            string droneID = (string) dict["droneID"];
+            ProtocolInterface protocol = (ProtocolInterface) dict["protocol"];
+
             // init sensors
             List<SensorInterface> sensors = new List<SensorInterface>
             {
@@ -22,9 +27,6 @@ namespace Client.Drone
                 new VirtualOrientation(),
                 new VirtualBattery()
             };
-
-            // define protocol
-            ProtocolInterface protocol = new Http("http://10.30.134.34:8011/drones");
 
             // send data to server
             while (true)

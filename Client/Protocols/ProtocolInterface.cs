@@ -8,5 +8,6 @@ namespace Client.Protocols
     interface ProtocolInterface
     {
         void Send(string data);
+        string Received(string droneID);
     }
 }
