@@ -16,7 +16,7 @@ namespace Client.Protocols
 
         public void Send(string data)
         {
-            httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint);
+            httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint + "/drones");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
@@ -30,6 +30,22 @@ namespace Client.Protocols
             Console.Out.WriteLine(httpResponse.StatusCode);
 
             httpResponse.Close();
+        }
+
+        public string Received(string droneID)
+        {
+            httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint+"/drones/"+ droneID + "/action");
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "GET";
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            Console.Out.WriteLine(httpResponse.StatusCode);
+            
+            string json = new StreamReader(httpResponse.GetResponseStream()).ReadToEnd();
+            
+            httpResponse.Close();
+
+            return json;
         }
     }
 }
