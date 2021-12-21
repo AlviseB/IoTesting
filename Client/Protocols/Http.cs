@@ -17,7 +17,7 @@ namespace Client.Protocols
         public void Send(string data)
         {
             httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint);
-            httpWebRequest.ContentType = "text/json";
+            httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
