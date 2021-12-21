@@ -34,12 +34,12 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   - **storico dei dati raccolti**, contiene lo storico dei dati inviati dai droni (e id del drone)
 
   ### Endpoints
-  `GET /drones` Restituisce tutti i droni con i dati aggiornati
+  `GET /drones` Restituisce tutti i droni con i relativi dati aggiornati
   
-  `GET /drones/:ID` Restituisce il drone *ID*
+  `GET /drones/:ID` Restituisce i dati più recenti dei sensori del drone identificato dal parametro *ID*
   
-  `POST /drones` Crea un drone con i dati inviati
+  `POST /drones` Inserisce un nuovo record contenente i dati dei sensori relativi al drone che li invia
   
-  `GET /drones/:ID/action` Restituisce la prossima azione del drone *ID*
+  `GET /drones/:ID/action` Restituisce la prossima azione da eseguire per il drone identificato da *ID*
   
-  `POST /drones/:ID/action` Crea un'azione che il drone *ID* eseguirà
+  `POST /drones/:ID/action` Inserisce in coda un'azione da eseguire per il drone identificato da *ID*
