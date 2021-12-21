@@ -1,25 +1,26 @@
-var restify = require('restify');
+const restify = require('restify');
+const morgan = require('morgan')
+const droneController = require('./src/api/drone/drone.controller')
+
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/HTTPDrone', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 var server = restify.createServer();
 server.use(restify.plugins.bodyParser());
+server.use(morgan('tiny'))
 
-server.get('/drones', function(req, res, next) {
-    res.send('List of drones: [TODO]');
-    return next();
-});
+server.get('/drones', droneController.getAll);
 
-server.get('/drones/:id', function(req, res, next) {
-    res.send('Current values for drone ' + req.params['id'] + ': [TODO]');
-    return next();
-});
+server.get('/drones/:id', droneController.getOne);
 
-server.post('/drones/:id', function(req, res, next) {
-    res.send('Data received from drone [TODO]');
+server.get('/drones/:id/action', droneController.getAction);
 
-    console.log(req.body);
+server.post('/drones/:id/action', droneController.postAction);
 
-    return next();
-});
+server.post('/drones', droneController.post);
 
 server.listen(8011, function() {
     console.log('%s listening at %s', server.name, server.url);

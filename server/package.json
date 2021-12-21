@@ -4,12 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "mongoose": "^6.1.2",
     "mqtt": "^4.2.8",
-    "restify": "^6.4.0"
+    "mssql": "^7.3.0",
+    "restify": "^6.4.0",
+    "tedious": "^14.0.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0"
   }
 }
