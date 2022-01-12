@@ -5,72 +5,79 @@ using System.Text;
 using System.Threading.Tasks;
 using Client.Sensors;
 using MQTTnet;
-using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
-using MQTTnet.Extensions.ManagedClient;
+using MQTTnet.Client;
+using MQTTnet.Client.Connecting;
+using MQTTnet.Client.Subscribing;
 
 namespace Client.Protocols
 {
     class MQTT : ProtocolInterface
     {
-        IManagedMqttClient mqttClient;
-        string basePath = "iot2021/thiene/";
-        public MQTT(string server, int port)
+        IMqttClient mqttClient;
+        string baseTopic = "iot2021/thiene/";
+        private string broker;
+
+        public MQTT(string broker)
         {
-            // Creates a new client
-            MqttClientOptionsBuilder builder = new MqttClientOptionsBuilder()
-                                                    .WithClientId("3e63e4a657af4f7d8a7454fe1e3cd269")
-                                                    .WithTcpServer(server, port);
-
-            // Create client options objects
-            ManagedMqttClientOptions options = new ManagedMqttClientOptionsBuilder()
-                                    .WithAutoReconnectDelay(TimeSpan.FromSeconds(60))
-                                    .WithClientOptions(builder.Build())
-                                    .Build();
-
-            // Creates the client object
-            mqttClient = new MqttFactory().CreateManagedMqttClient();
-
-            // Set up handlers
-            mqttClient.ConnectedHandler = new MqttClientConnectedHandlerDelegate(OnConnected);
-            mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(OnDisconnected);
-            mqttClient.ConnectingFailedHandler = new ConnectingFailedHandlerDelegate(OnConnectingFailed);
-
-            // Starts a connection with the Broker
-            mqttClient.StartAsync(options).GetAwaiter().GetResult();
+            this.broker = broker;
+            Connect().GetAwaiter().GetResult();
         }
 
-        public static void OnConnected(MqttClientConnectedEventArgs obj)
+        private async Task<MqttClientConnectResult> Connect()
         {
-            Console.WriteLine("Successfully connected.");
+            var factory = new MqttFactory();
+
+            var options = new MqttClientOptionsBuilder()
+                .WithTcpServer(this.broker)
+                .Build();
+
+            mqttClient = factory.CreateMqttClient();
+
+            return await mqttClient.ConnectAsync(options, System.Threading.CancellationToken.None);
         }
 
-        public static void OnConnectingFailed(ManagedProcessFailedEventArgs obj)
-        {
-            Console.WriteLine("Couldn't connect to broker.");
-        }
-
-        public static void OnDisconnected(MqttClientDisconnectedEventArgs obj)
-        {
-            Console.WriteLine("Successfully disconnected.");
-        }
-
-        public void Send(string droneID, List<SensorInterface> sensors)
+        public async void Send(string droneID, List<SensorInterface> sensors)
         {
             foreach (var sensor in sensors)
             {
                 //get sensor data
                 string data = "{"+sensor.toJson()+"}";
-                //get path ("iot2021/thiene/"+ drone id + sensor name)
-                string path = basePath + droneID + "/" + sensor.getSensorName();
-                mqttClient.PublishAsync(path, data);
+                //get topic ("iot2021/thiene/"+ drone id + sensor name)
+                string topic = baseTopic + droneID + "/" + sensor.getSensorName();
+
+                var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(data)
+                .WithExactlyOnceQoS()
+                .Build();
+
+                await mqttClient.PublishAsync(message, System.Threading.CancellationToken.None);
             }
         }
 
-        public string Received(string droneID)
+        public void Received(string droneID)
         {
-            return "TEST";
+            string topic = baseTopic + droneID + "/#";
+            Console.WriteLine(topic);
+            
+            mqttClient.UseConnectedHandler(async e =>
+            {
+                // Subscribe to a topic
+                await mqttClient.SubscribeAsync("iot2021/#");
+            });
+
+            mqttClient.UseApplicationMessageReceivedHandler(e =>
+            {
+                Console.WriteLine("### RECEIVED APPLICATION MESSAGE ###");
+                Console.WriteLine($"+ Topic = {e.ApplicationMessage.Topic}");
+                Console.WriteLine($"+ Payload = {Encoding.UTF8.GetString(e.ApplicationMessage.Payload)}");
+                Console.WriteLine($"+ QoS = {e.ApplicationMessage.QualityOfServiceLevel}");
+                Console.WriteLine($"+ Retain = {e.ApplicationMessage.Retain}");
+                Console.WriteLine();
+
+                Task.Run(() => mqttClient.PublishAsync("hello/world"));
+            });
         }
     }
 }
