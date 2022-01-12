@@ -4,6 +4,7 @@ using System.Net;
 using System.IO;
 using Client.Sensors;
 using Client.JSON;
+using Newtonsoft.Json;
 
 namespace Client.Protocols
 {
@@ -37,20 +38,34 @@ namespace Client.Protocols
             httpResponse.Close();
         }
 
-        public string Received(string droneID)
+        public void Received(string droneID)
         {
-            httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint+"/drones/"+ droneID + "/action");
-            httpWebRequest.ContentType = "application/json";
-            httpWebRequest.Method = "GET";
+            while (true)
+            {
+                //get JSON
+                httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint+"/drones/"+ droneID + "/action");
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "GET";
 
-            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            Console.Out.WriteLine(httpResponse.StatusCode);
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                Console.Out.WriteLine(httpResponse.StatusCode);
             
-            string json = new StreamReader(httpResponse.GetResponseStream()).ReadToEnd();
+                string json = new StreamReader(httpResponse.GetResponseStream()).ReadToEnd();
             
-            httpResponse.Close();
+                httpResponse.Close();
 
-            return json;
+                //deserialize and print 
+                try
+                {
+                    Dictionary<string, string> action = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                    Console.WriteLine("Command : " + action["command"]);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Receiving error: " + ex);
+                }
+                System.Threading.Thread.Sleep(1000);
+            }
         }
     }
 }

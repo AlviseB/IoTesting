@@ -9,6 +9,6 @@ namespace Client.Protocols
     interface ProtocolInterface
     {
         void Send(string droneID, List<SensorInterface> sensors);
-        string Received(string droneID);
+        void Received(string droneID);
     }
 }
