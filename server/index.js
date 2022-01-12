@@ -1,4 +1,4 @@
-const droneController = require("./src/api/drone/drone.controller");
+const sensorModel = require("./src/api/sensor/sensor.model");
 
 let subscriptions = [];
 
@@ -11,34 +11,45 @@ mongoose.connect("mongodb://localhost:27017/HTTPDrone", {
 const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://test.mosquitto.org')
 
-const root = "iot2021"
-const luogo = "thiene"
+const root = "iot2021";
+const version = "v1";
+const zone = "thiene";
 
 client.on('connect', function () {
-  let topic = `${root}/${luogo}/#`;
+  let topic = `${root}/${version}/${zone}/+/status/#`;
   client.subscribe(topic, function (err) {
     subscriptions.push(topic)
     console.log("subscribed to #");
   })
 })
 
-client.on('message', function (topic, message) {
+client.on('message', async function (topic, message) {
   // message is Buffer
-  console.log(`Topic: ${topic} type: ${typeof(topic)}`)
-  console.log(`Message: ${message} type: ${typeof(message)}`)
+  let [root, version, zone, droneID, status, sensorType] = topic.split("/");
+  console.log(message.toString());
+  data = JSON.parse(message.toString());
+  sensorData = {};
+  sensorData.droneID = droneID;
+  sensorData.timestamp = (new Date()).toUTCString();
+  sensorData.sensorType = sensorType;
+  sensorData.value = data[sensorType];
+  console.log(sensorData);
+  res = await sensorModel.create(sensorData);
+  console.log("Added: ", res);
 })
 
 setInterval(() => {
   const drone = "dr1_42"
-  client.publish(`${root}/${luogo}/${drone}/comando`, "esempio comando drone")
+  client.publish(`${root}/${version}/${zone}/${drone}/command`, '{"command": "none"}')
 
 }, 1000);
 
 
 process.on('SIGINT', function () {
-  console.log('FanculoSecondo...');
+  console.log('Unsubscribing...');
   console.log(subscriptions.length);
   subscriptions.forEach((sub) => client.unsubscribe(sub))
   client.end();
+  console.log("Exited.");
   process.exit();
 });

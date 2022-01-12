@@ -9,7 +9,7 @@ const DroneSchema = mongoose.Schema({
         latitude: Number,
         longitude: Number
     },
-    orientation: [Number],
+    orientation: Object,
     timestamp: Date
 });
 
