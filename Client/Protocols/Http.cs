@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.IO;
+using Client.Sensors;
+using Client.JSON;
 
 namespace Client.Protocols
 {
@@ -14,11 +17,13 @@ namespace Client.Protocols
             this.endpoint = endpoint;
         }
 
-        public void Send(string data)
+        public void Send(string droneID, List<SensorInterface> sensors)
         {
             httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint + "/drones");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
+
+            string data = JsonManager.getJsonString(droneID, sensors);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {

@@ -8,6 +8,11 @@ namespace Client.Sensors
 {
     class VirtualSpeedSensor : SpeedSensorInterface, SensorInterface
     {
+        public string getSensorName()
+        {
+            return "speed";
+        }
+
         public string toJson()
         {
             return "\"speed\": " + GetSpeed();

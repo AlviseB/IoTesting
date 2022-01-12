@@ -31,11 +31,9 @@ namespace Client.Drone
             // send data to server
             while (true)
             {
-                String json = getJsonString((string)droneID, sensors);
                 try
                 {
-                    protocol.Send(json);
-                    Console.WriteLine("Data sent: " + json);
+                    protocol.Send(droneID, sensors);
                 }
                 catch (Exception ex)
                 {
@@ -43,23 +41,6 @@ namespace Client.Drone
                 }
                 System.Threading.Thread.Sleep(1000);
             }
-        }
-
-        static string getJsonString(String droneID, List<SensorInterface> sensors)
-        {
-            String json = "{";
-            //add drone ID in json string
-            json += "\"ID\": \"" + droneID + "\"";
-            //add sensors in json string
-            foreach (SensorInterface sensor in sensors)
-            {
-                json += ", ";
-                string json_sensor = sensor.toJson();
-                json += json_sensor;
-            }
-            json += '}';
-
-            return json;
         }
     }
 }
