@@ -9,14 +9,18 @@ using MQTTnet.Client.Options;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Subscribing;
+using System.Configuration;
 
 namespace Client.Protocols
 {
     class MQTT : ProtocolInterface
     {
         IMqttClient mqttClient;
-        string baseTopic = "iot2021/thiene/";
+        string baseTopic = "iot2021/v1/thiene/";
         private string broker;
+        private string clientID = "drone_" + ConfigurationManager.AppSettings.Get("droneID");
+
+        static int numberOfClient = 0;
 
         public MQTT(string broker)
         {
@@ -28,8 +32,12 @@ namespace Client.Protocols
         {
             var factory = new MqttFactory();
 
+            //update number of client for have different clients id 
+            numberOfClient++;
+
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(this.broker)
+                .WithClientId(clientID + numberOfClient)
                 .Build();
 
             mqttClient = factory.CreateMqttClient();
@@ -43,8 +51,8 @@ namespace Client.Protocols
             {
                 //get sensor data
                 string data = "{"+sensor.toJson()+"}";
-                //get topic ("iot2021/thiene/"+ drone id + sensor name)
-                string topic = baseTopic + droneID + "/" + sensor.getSensorName();
+                //get topic - iot2021/*version*/*luogo*/*drone*/status/*sensor*
+                string topic = baseTopic + droneID + "/status/" + sensor.getSensorName();
 
                 var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
@@ -56,28 +64,22 @@ namespace Client.Protocols
             }
         }
 
-        public void Received(string droneID)
+        public async void Received(string droneID)
         {
-            string topic = baseTopic + droneID + "/#";
-            Console.WriteLine(topic);
-            
-            mqttClient.UseConnectedHandler(async e =>
-            {
-                // Subscribe to a topic
-                await mqttClient.SubscribeAsync("iot2021/#");
-            });
-
             mqttClient.UseApplicationMessageReceivedHandler(e =>
             {
-                Console.WriteLine("### RECEIVED APPLICATION MESSAGE ###");
-                Console.WriteLine($"+ Topic = {e.ApplicationMessage.Topic}");
+                Console.WriteLine("#RECEIVED COMMAND MESSAGE :");
+                //Console.WriteLine($"+ Topic = {e.ApplicationMessage.Topic}");
                 Console.WriteLine($"+ Payload = {Encoding.UTF8.GetString(e.ApplicationMessage.Payload)}");
-                Console.WriteLine($"+ QoS = {e.ApplicationMessage.QualityOfServiceLevel}");
-                Console.WriteLine($"+ Retain = {e.ApplicationMessage.Retain}");
+                //Console.WriteLine($"+ QoS = {e.ApplicationMessage.QualityOfServiceLevel}");
+                //Console.WriteLine($"+ Retain = {e.ApplicationMessage.Retain}");
                 Console.WriteLine();
-
-                Task.Run(() => mqttClient.PublishAsync("hello/world"));
             });
+
+            // iot2021/*version*/*luogo*/*drone*/command
+            string topic = baseTopic + droneID + "/command";
+
+            await mqttClient.SubscribeAsync(topic);
         }
     }
 }
