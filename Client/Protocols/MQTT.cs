@@ -16,7 +16,7 @@ namespace Client.Protocols
     class MQTT : ProtocolInterface
     {
         IMqttClient mqttClient;
-        string baseTopic = "iot2021/v1/thiene/";
+        string baseTopic = ConfigurationManager.AppSettings.Get("company") + "/"+ ConfigurationManager.AppSettings.Get("version") + "/"+ ConfigurationManager.AppSettings.Get("location") + "/";
         private string broker;
         private string clientID = "drone_" + ConfigurationManager.AppSettings.Get("droneID");
 
