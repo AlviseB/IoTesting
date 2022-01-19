@@ -39,8 +39,6 @@ namespace Client.Protocols
 
                 // Get the /hello resource from localhost.
                 message.SetUri("coap://"+endpoint+"/drones");
-                Console.WriteLine(data);
-                Console.WriteLine(Encoding.UTF8.GetBytes(data));
 
                 Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");
                 await client.SendAsync(message, cancellationTokenSource.Token);
