@@ -68,6 +68,12 @@ namespace Client.Protocols
                 // Wait for the server to respond.
                 var response = await client.ReceiveAsync(cancellationTokenSource.Token);
 
+                string payload = Encoding.UTF8.GetString(response.Message.Payload);
+
+                string command = JsonManager.deserializeCommand(payload);
+                Console.WriteLine("Command : " + command);
+
+
                 // Output our response
                 Console.WriteLine($"Received a command from {response.Endpoint}\n{Encoding.UTF8.GetString(response.Message.Payload)}");
             }

@@ -4,7 +4,6 @@ using System.Net;
 using System.IO;
 using Client.Sensors;
 using Client.JSON;
-using Newtonsoft.Json;
 
 namespace Client.Protocols
 {
@@ -57,8 +56,8 @@ namespace Client.Protocols
                 //deserialize and print 
                 try
                 {
-                    Dictionary<string, string> action = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    Console.WriteLine("Command : " + action["command"]);
+                    string command = JsonManager.deserializeCommand(json);
+                    Console.WriteLine("Command : " + command);
                 }
                 catch (Exception ex)
                 {
