@@ -18,7 +18,7 @@ namespace Client.Protocols
         public CoAP(string endpoint)
         {
             this.endpoint = endpoint;
-            // Create a new client using a UDP endpoint (defaults to 0.0.0.0 with any available port number)
+            // Create a new client using a UDP endpoint
             client = new CoapClient(new CoapUdpEndPoint());
             // Create a cancelation token that cancels after 1 minute
             cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
@@ -26,6 +26,7 @@ namespace Client.Protocols
 
         public async void Send(string droneID, Dictionary<string, string> sensors)
         {
+            //assemble sensors data in a single json string
             string data = JsonManager.assembleJSON(droneID, sensors);
 
             try
@@ -33,11 +34,10 @@ namespace Client.Protocols
                 var message = new CoapMessage
                 {
                     Code = CoapMessageCode.Post,
-                    Type = CoapMessageType.NonConfirmable,  //non confirmable, non mi interessa ricevere una risposta, accetto che possa perdere dati ogni tanto a favore di velocità e leggerezza
+                    Type = CoapMessageType.NonConfirmable,  //non confirmable, accept that it may lose data every now and then in favor of speed and lightness
                     Payload = Encoding.UTF8.GetBytes(data),
                 };
 
-                // Get the /hello resource from localhost.
                 message.SetUri("coap://"+endpoint+"/drones");
 
                 Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");
@@ -61,7 +61,6 @@ namespace Client.Protocols
                         Type = CoapMessageType.Confirmable,
                     };
 
-                    // Get the /hello resource from localhost.
                     message.SetUri("coap://" + endpoint + "/drones/" + droneID + "/action");
 
                     Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");

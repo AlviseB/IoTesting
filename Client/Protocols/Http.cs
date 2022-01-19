@@ -23,6 +23,7 @@ namespace Client.Protocols
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
+            //assemble sensors data in a single json string
             string data = JsonManager.assembleJSON(droneID, sensors);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
