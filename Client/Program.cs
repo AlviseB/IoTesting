@@ -23,8 +23,12 @@ namespace Client
             //ProtocolInterface receiver_protocol = new MQTT("test.mosquitto.org");
 
             // define CoAP protocol
-            ProtocolInterface sender_protocol = new CoAP("localhost");
-            ProtocolInterface receiver_protocol = new CoAP("localhost");
+            //ProtocolInterface sender_protocol = new CoAP("localhost");
+            //ProtocolInterface receiver_protocol = new CoAP("localhost");
+
+            // define AMQP protocol
+            ProtocolInterface sender_protocol = new AMQP("amqps://kxbxxcqx:IqK-VIirhbu-Gmil2bED0EsPXUxfeaa2@goose.rmq2.cloudamqp.com/kxbxxcqx");
+            ProtocolInterface receiver_protocol = new AMQP("amqps://kxbxxcqx:IqK-VIirhbu-Gmil2bED0EsPXUxfeaa2@goose.rmq2.cloudamqp.com/kxbxxcqx");
 
             // init sensors
             List<SensorInterface> sensors = new List<SensorInterface>
