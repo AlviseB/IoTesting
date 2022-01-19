@@ -30,16 +30,17 @@ namespace Client.Protocols
 
             try
             {
-                // Create a simple GET request
                 var message = new CoapMessage
                 {
-                    Code = CoapMessageCode.Get,
+                    Code = CoapMessageCode.Post,
                     Type = CoapMessageType.NonConfirmable,  //non confirmable, non mi interessa ricevere una risposta, accetto che possa perdere dati ogni tanto a favore di velocità e leggerezza
                     Payload = Encoding.UTF8.GetBytes(data),
                 };
 
                 // Get the /hello resource from localhost.
                 message.SetUri("coap://"+endpoint+"/drones");
+                Console.WriteLine(data);
+                Console.WriteLine(Encoding.UTF8.GetBytes(data));
 
                 Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");
                 await client.SendAsync(message, cancellationTokenSource.Token);
