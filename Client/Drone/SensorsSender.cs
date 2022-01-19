@@ -28,7 +28,7 @@ namespace Client.Drone
                 new VirtualBattery()
             };
 
-            // send data to server
+            // send data
             while (true)
             {
                 try
