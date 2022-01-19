@@ -11,13 +11,31 @@ Scritto in **C#**
 Simula sensori di velocità, altitudine, orientamento nei tre assi (x,y,z), GPS (latitudine e longitudine), percentuale della batteria residua.
 
 All'avvio dell'applicazione vengono lanciati due **thread**:
-  - **invio dei dati dei sensori**; invia i dati come un'unica stringa in formato JSON, comprensivi di timestamp e id del drone. Tale soluzione permette di ottimizzare le chiamate al server, nonché le scritture sul database.
-  - **lettura dei comandi da eseguire**; richiede il comando da eseguire al server, deserializza il JSON utilizzando la libreria Newtonsoft JSON.NET e lo stampa in console per fini didattici - i comandi andrebbero in una soluzione ideale eseguiti dal drone, prima di richiedere il comando successivo. 
+  - **invio dei dati dei sensori**; 
+  - **lettura dei comandi da eseguire**;
  
-Ogni thread attende 1 secondo prima di inviare nuovamente i dati/leggere il comando. Questa scelta è legata al tempo a disposizione per lo sviluppo, ma una soluzione migliore sarebbe stata **modificare la frequenza di chiamate al server in relazione allo stato del drone** e alla velocità di esecuzione dei comandi.
+ Il thread per l'invio dei dati dei sensori richiama il metodo *send* del protocollo specificato con cadenza pari a 1 secondo. Questa scelta è legata al tempo a disposizione per lo sviluppo, ma una soluzione migliore sarebbe stata **modificare la frequenza di chiamate al server in relazione allo stato del drone**.
+ Il thread per la lettura dei comandi da eseguire richiama il metodo *received* del protocollo specificato. 
+ 
+L'utilizzo di thread separati permette la scelta di due **protocolli indipendenti per invio dei dati e ricezione dei comandi**.
 
-Il drone viene identificato per semplicità di sviluppo da una stringa univoca (ID), definita nella funzione Main() dell'applicativo. Soluzioni più efficienti prevederebbero dei sistemi che ne garantiscano l'univocità, come ad esempio l'utilizzo dell'indirizzo MAC del dispositivo.
+Il drone viene identificato per semplicità di sviluppo da una stringa univoca (ID), definita nel **file di configurazione** dell'applicazione (app.config). In questo modo è possibile modificare facilmente questo parametro in fase di assemblaggio del singolo drone. Soluzioni più efficienti prevederebbero dei sistemi che ne garantiscano l'univocità, come ad esempio l'utilizzo dell'indirizzo MAC del dispositivo.
 
+Sono state inserite nel file di configurazione anche le seguenti variabili:
+  - *location*, dove troviamo impostata la località della sede da dove viene noleggiato il drone, immaginiamo infatti la possibilità di avere più sedi;
+  - *company*, il nome della compagnia (nel nostro caso abbiamo usato il nome del corso - iot2021)
+  - *MQTT_version*, la versione con cui vengono scambiati i messaggi con il protocollo MQTT
+
+  ### HTTP
+  Descrizione dei metodi utilizzati dal protocollo HTTP:
+  - *send*, i dati vengono inviati come un'**unica stringa in formato JSON**, comprensivi di timestamp e id del drone. Tale soluzione permette di **ottimizzare le chiamate** al server, nonché le scritture sul database.
+  - *received*, richiede con cadenza pari a 1 secondo il comando da eseguire al server, deserializza il JSON utilizzando la libreria Newtonsoft JSON.NET e lo stampa in console per fini didattici - i comandi andrebbero in una soluzione ideale eseguiti dal drone, prima di richiedere il comando successivo.
+
+  ### MQTT
+  Descrizione dei metodi utilizzati dal protocollo MQTT:
+  - *send*, per ogni sensore pubblica sul topic *company*/*version*/*luogo*/*drone*/status/*sensor*, dove le parole in *corsivo* sono variabili, una stringa in formato json con il valore letto dal sensore. La scelta di inviare il dato in json e non il singolo valore del sensore è stata determinata dalla presenza di sensori con dati complessi (come il GPS che ha i dati di latitudine e longitudine), nonché per rendere possibili aggiornamenti futuri che necessitino dell'invio di dati completi, come ad esempio un resoconto dello stato del drone. Siamo consapevoli che questa scelta determini un aumento, seppur minimo poichè si parla di pochi caratteri, del peso dei singoli payload.
+  - *received*, si iscrive al topic *company*/*version*/*luogo*/*drone*/command e resta in attesa di comandi. Come per il protocollo HTTP stampiamo il comando su console per fini didattici.
+  
 ---
 
 ## Server
@@ -45,4 +63,7 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   `POST /drones/:ID/action` Inserisce in coda un'azione da eseguire per il drone identificato da *ID*
   
   ### Topic MQTT
-  `IoTesting/dr1_42/speed`, ovvero progetto/ID_Drone/sensore
+  `*company*/*version*/*luogo*/*drone*/command`, il server pubblica su questo topic i comandi da far eseguire al drone. Questa operazione potrebbe essere fatta da un altro dispositivo.
+  
+  `*company*/*version*/*luogo*/*drone*/status/*sensor*`, il server si iscrive a questo topic per ogni drone, ricevendo il payload di ogni sensore e inserendolo nel DB.
+  

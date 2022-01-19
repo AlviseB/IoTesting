@@ -8,6 +8,11 @@ namespace Client.Sensors
 {
     class VirtualAltitudeSensor : AltitudeSensorInterface, SensorInterface
     {
+        public string getSensorName()
+        {
+            return "altitude";
+        }
+
         public string toJson()
         {
             return "\"altitude\": " + GetAltitude();

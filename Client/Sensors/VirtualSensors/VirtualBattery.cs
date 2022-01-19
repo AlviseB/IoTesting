@@ -8,6 +8,11 @@ namespace Client.Sensors
 {
     class VirtualBattery : SensorInterface, BatteryInterface
     {
+        public string getSensorName()
+        {
+            return "battery";
+        }
+
         public string toJson()
         {
             return "\"battery\": " + GetBattery();

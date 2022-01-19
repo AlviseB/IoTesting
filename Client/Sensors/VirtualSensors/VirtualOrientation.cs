@@ -8,6 +8,11 @@ namespace Client.Sensors
 {
     class VirtualOrientation : SensorInterface, OrientationInterface
     {
+        public string getSensorName()
+        {
+            return "orientation";
+        }
+
         public string toJson()
         {
             return "\"orientation\": [" + GetX() + "," + GetY() + "," + GetZ() + "]";

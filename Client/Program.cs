@@ -4,6 +4,7 @@ using Client.Sensors;
 using Client.Protocols;
 using Client.Drone;
 using System.Threading;
+using System.Configuration;
 
 namespace Client
 {
@@ -11,11 +12,15 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            String droneID = "dr1_42";
+            String droneID = ConfigurationManager.AppSettings.Get("droneID");
 
-            // define protocol
-            ProtocolInterface sender_protocol = new Http("http://10.30.134.34:8011");
-            ProtocolInterface receiver_protocol = new Http("http://10.30.134.34:8011");
+            // define HTTP protocol
+            //ProtocolInterface sender_protocol = new Http("http://10.30.134.34:8011");
+            //ProtocolInterface receiver_protocol = new Http("http://10.30.134.34:8011");
+
+            // define MQTT protocol
+            ProtocolInterface sender_protocol = new MQTT("test.mosquitto.org");
+            ProtocolInterface receiver_protocol = new MQTT("test.mosquitto.org");
 
             //create thread parameter
             Dictionary<string, object> parameter = new Dictionary<string, object>

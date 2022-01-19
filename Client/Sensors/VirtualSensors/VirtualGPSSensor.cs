@@ -8,6 +8,11 @@ namespace Client.Sensors
 {
     class VirtualGPSSensor : SensorInterface, GPSSensorInterface
     {
+        public string getSensorName()
+        {
+            return "gps";
+        }
+
         public string toJson()
         {
             return "\"gps\": {\"latitude\": " + GetLatitude().ToString().Replace(',','.') + ", \"longitude\": " + GetLongitude().ToString().Replace(',', '.') + "}";

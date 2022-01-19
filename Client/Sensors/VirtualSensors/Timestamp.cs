@@ -8,6 +8,11 @@ namespace Client.Sensors
 {
     class Timestamp : SensorInterface, TimestampInterface
     {
+        public string getSensorName()
+        {
+            return "timestamp";
+        }
+
         public string toJson()
         {
             return "\"timestamp\": \"" + GetCurrentTimestamp() + "\"";
