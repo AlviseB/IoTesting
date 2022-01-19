@@ -28,14 +28,18 @@ Sono state inserite nel file di configurazione anche le seguenti variabili:
 
   ### HTTP
   Descrizione dei metodi utilizzati dal protocollo HTTP:
-  - *send*, i dati vengono inviati come un'**unica stringa in formato JSON**, comprensivi di timestamp e id del drone. Tale soluzione permette di **ottimizzare le chiamate** al server, nonché le scritture sul database.
-  - *received*, richiede con cadenza pari a 1 secondo il comando da eseguire al server, deserializza il JSON utilizzando la libreria Newtonsoft JSON.NET e lo stampa in console per fini didattici - i comandi andrebbero in una soluzione ideale eseguiti dal drone, prima di richiedere il comando successivo.
+  - *send*, i dati vengono inviati sull'endpoint `POST /drones` come un'**unica stringa in formato JSON**, comprensivi di timestamp e id del drone. Tale soluzione permette di **ottimizzare le chiamate** al server, nonché le scritture sul database.
+  - *received*, richiede con cadenza pari a 1 secondo il comando da eseguire al server sull'endpoint `GET /drones/:ID/action`, deserializza il JSON utilizzando il metodo statico *deserializeCommand* della classe *JsonManager* e lo stampa in console per fini didattici - i comandi andrebbero in una soluzione ideale eseguiti dal drone, prima di richiedere il comando successivo.
 
   ### MQTT
   Descrizione dei metodi utilizzati dal protocollo MQTT:
-  - *send*, per ogni sensore pubblica sul topic *company*/*version*/*luogo*/*drone*/status/*sensor*, dove le parole in *corsivo* sono variabili, una stringa in formato json con il valore letto dal sensore. La scelta di inviare il dato in json e non il singolo valore del sensore è stata determinata dalla presenza di sensori con dati complessi (come il GPS che ha i dati di latitudine e longitudine), nonché per rendere possibili aggiornamenti futuri che necessitino dell'invio di dati completi, come ad esempio un resoconto dello stato del drone. Siamo consapevoli che questa scelta determini un aumento, seppur minimo poichè si parla di pochi caratteri, del peso dei singoli payload.
-  - *received*, si iscrive al topic *company*/*version*/*luogo*/*drone*/command e resta in attesa di comandi. Come per il protocollo HTTP stampiamo il comando su console per fini didattici.
+  - *send*, pubblica sul topic `company/version/luogo/drone/status/sensor`, dove *status* è costante, una **stringa in formato json per ogni sensore** con il valore letto dal sensore. La scelta di inviare il dato in json e non il singolo valore del sensore è stata determinata dalla presenza di sensori con dati complessi (come il GPS che ha i dati di latitudine e longitudine), nonché per rendere possibili aggiornamenti futuri che necessitino dell'**invio di dati completi**, come ad esempio un resoconto dello stato del drone. Siamo consapevoli che questa scelta determini un aumento, seppur minimo poichè si parla di pochi caratteri, del peso dei singoli payload.
+  - *received*, si iscrive al topic `company/version/luogo/drone/command`, dove *command* è costante, e resta in attesa di comandi. Come per il protocollo HTTP stampiamo il comando su console per fini didattici.
   
+  ### CoAP
+  Descrizione dei metodi utilizzati dal protocollo CoAP:
+  - *send*, come per il protocollo HTTP, i dati vengono inviati come un'**unica stringa in formato JSON** sull'endpoint `POST /drones`, comprensivi di timestamp e id del drone.
+  - *received*, come per il protocollo HTTP, richiede ogni secondo sull'endpoint `GET /drones/:ID/action` il comando da eseguire al server, deserializza il JSON utilizzando il metodo statico *deserializeCommand* della classe *JsonManager* e lo stampa in console. Una soluzione ottimale, non realizzata per mancanza di tempo e assenza di metodi adatti nella libreria, prevedrebbe la **sottoscrizione tramite Observe alla risorsa** sul medesimo endpoint utilizzato.
 ---
 
 ## Server
@@ -66,4 +70,8 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   `*company*/*version*/*luogo*/*drone*/command`, il server pubblica su questo topic i comandi da far eseguire al drone. Questa operazione potrebbe essere fatta da un altro dispositivo.
   
   `*company*/*version*/*luogo*/*drone*/status/*sensor*`, il server si iscrive a questo topic per ogni drone, ricevendo il payload di ogni sensore e inserendolo nel DB.
+  
+  ### Endpoints CoAP
+  `POST /drones` Inserisce un nuovo record contenente i dati dei sensori relativi al drone che li invia
+  `GET /drones/:ID/action` Restituisce la prossima azione da eseguire per il drone identificato da *ID*
   
