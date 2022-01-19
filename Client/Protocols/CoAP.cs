@@ -49,9 +49,32 @@ namespace Client.Protocols
             }
         }
 
-        public void Received(string droneID)
+        public async void Received(string droneID)
         {
+            try
+            {
+                var message = new CoapMessage
+                {
+                    Code = CoapMessageCode.Get,
+                    Type = CoapMessageType.Confirmable,
+                };
 
+                // Get the /hello resource from localhost.
+                message.SetUri("coap://" + endpoint + "/drones/"+droneID+"/action");
+
+                Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");
+                await client.SendAsync(message, cancellationTokenSource.Token);
+
+                // Wait for the server to respond.
+                var response = await client.ReceiveAsync(cancellationTokenSource.Token);
+
+                // Output our response
+                Console.WriteLine($"Received a command from {response.Endpoint}\n{Encoding.UTF8.GetString(response.Message.Payload)}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception caught: {ex}");
+            }
         }
     }
 }
