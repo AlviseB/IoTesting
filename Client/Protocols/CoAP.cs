@@ -24,9 +24,9 @@ namespace Client.Protocols
             cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(1));
         }
 
-        public async void Send(string droneID, List<SensorInterface> sensors)
+        public async void Send(string droneID, Dictionary<string, string> sensors)
         {
-            string data = JsonManager.getJsonString(droneID, sensors);
+            string data = JsonManager.assembleJSON(droneID, sensors);
 
             try
             {

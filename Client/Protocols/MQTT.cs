@@ -45,14 +45,14 @@ namespace Client.Protocols
             return await mqttClient.ConnectAsync(options, System.Threading.CancellationToken.None);
         }
 
-        public async void Send(string droneID, List<SensorInterface> sensors)
+        public async void Send(string droneID, Dictionary<string, string> sensors)
         {
             foreach (var sensor in sensors)
             {
                 //get sensor data
-                string data = "{"+sensor.toJson()+"}";
+                string data = "{"+sensor.Value+"}";
                 //get topic - *company*/*version*/*luogo*/*drone*/status/*sensor*
-                string topic = baseTopic + droneID + "/status/" + sensor.getSensorName();
+                string topic = baseTopic + droneID + "/status/" + sensor.Key;
 
                 var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)

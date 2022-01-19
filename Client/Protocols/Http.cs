@@ -17,13 +17,13 @@ namespace Client.Protocols
             this.endpoint = endpoint;
         }
 
-        public void Send(string droneID, List<SensorInterface> sensors)
+        public void Send(string droneID, Dictionary<string, string> sensors)
         {
             httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint + "/drones");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
-            string data = JsonManager.getJsonString(droneID, sensors);
+            string data = JsonManager.assembleJSON(droneID, sensors);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {

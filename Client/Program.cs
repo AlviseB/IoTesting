@@ -26,6 +26,17 @@ namespace Client
             ProtocolInterface sender_protocol = new CoAP("localhost");
             ProtocolInterface receiver_protocol = new CoAP("localhost");
 
+            // init sensors
+            List<SensorInterface> sensors = new List<SensorInterface>
+            {
+                new Timestamp(),
+                new VirtualSpeedSensor(),
+                new VirtualGPSSensor(),
+                new VirtualAltitudeSensor(),
+                new VirtualOrientation(),
+                new VirtualBattery()
+            };
+
             //create thread parameter
             Dictionary<string, object> parameter = new Dictionary<string, object>
             {
@@ -33,6 +44,8 @@ namespace Client
             };
 
             parameter["protocol"] = sender_protocol;
+            parameter["sensors"] = sensors;
+
             //thread for send sensors data
             Thread senderThread = new Thread(SensorsSender.doWork);
             senderThread.Start(parameter);
@@ -43,7 +56,6 @@ namespace Client
             //thread for receive action data
             Thread receiverThread = new Thread(ActionReceiver.doWork);
             receiverThread.Start(parameter);
-
         }
 
     }
