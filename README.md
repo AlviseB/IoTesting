@@ -14,7 +14,7 @@ All'avvio dell'applicazione vengono lanciati due **thread**:
   - **invio dei dati dei sensori**; 
   - **lettura dei comandi da eseguire**;
  
- Il thread per l'invio dei dati dei sensori richiama il metodo *send* del protocollo specificato con cadenza pari a 1 secondo. Questa scelta è legata al tempo a disposizione per lo sviluppo, ma una soluzione migliore sarebbe stata **modificare la frequenza di chiamate al server in relazione allo stato del drone**.
+ Il thread per l'invio dei dati dei sensori esegue la lettura dei dati dai sensori, costruisce un dizionario che ha come chiavi i nomi dei sensori e come valori i valori letti dagli stessi. In questo modo separiamo la lettura dei dati dal loro invio. Poi richiama il metodo *send* del protocollo specificato con cadenza pari a 1 secondo,. Questa scelta è legata al tempo a disposizione per lo sviluppo, ma una soluzione migliore sarebbe stata **modificare la frequenza di chiamate al server in relazione allo stato del drone**.
  Il thread per la lettura dei comandi da eseguire richiama il metodo *received* del protocollo specificato. 
  
 L'utilizzo di thread separati permette la scelta di due **protocolli indipendenti per invio dei dati e ricezione dei comandi**.
@@ -40,6 +40,12 @@ Sono state inserite nel file di configurazione anche le seguenti variabili:
   Descrizione dei metodi utilizzati dal protocollo CoAP:
   - *send*, come per il protocollo HTTP, i dati vengono inviati come un'**unica stringa in formato JSON** sull'endpoint `POST /drones`, comprensivi di timestamp e id del drone.
   - *received*, come per il protocollo HTTP, richiede ogni secondo sull'endpoint `GET /drones/:ID/action` il comando da eseguire al server, deserializza il JSON utilizzando il metodo statico *deserializeCommand* della classe *JsonManager* e lo stampa in console. Una soluzione ottimale, non realizzata per mancanza di tempo e assenza di metodi adatti nella libreria, prevedrebbe la **sottoscrizione tramite Observe alla risorsa** sul medesimo endpoint utilizzato.
+
+  ### AMQP
+  Descrizione dei metodi utilizzati dal protocollo AMQP:
+  - *send*, i dati vengono pubblicati sul **direct exchange** *AMQP-SERVER*  come un'**unica stringa in formato JSON** .
+  - *received*, il drone consuma i messaggi pubblicati su una coda che ha come nome l'id del drone.
+
 ---
 
 ## Server
