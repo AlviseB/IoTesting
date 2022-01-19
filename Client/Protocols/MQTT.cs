@@ -16,7 +16,7 @@ namespace Client.Protocols
     class MQTT : ProtocolInterface
     {
         IMqttClient mqttClient;
-        string baseTopic = ConfigurationManager.AppSettings.Get("company") + "/"+ ConfigurationManager.AppSettings.Get("version") + "/"+ ConfigurationManager.AppSettings.Get("location") + "/";
+        string baseTopic = ConfigurationManager.AppSettings.Get("company") + "/"+ ConfigurationManager.AppSettings.Get("MQTT_version") + "/"+ ConfigurationManager.AppSettings.Get("location") + "/";
         private string broker;
         private string clientID = "drone_" + ConfigurationManager.AppSettings.Get("droneID");
 
@@ -51,7 +51,7 @@ namespace Client.Protocols
             {
                 //get sensor data
                 string data = "{"+sensor.toJson()+"}";
-                //get topic - iot2021/*version*/*luogo*/*drone*/status/*sensor*
+                //get topic - *company*/*version*/*luogo*/*drone*/status/*sensor*
                 string topic = baseTopic + droneID + "/status/" + sensor.getSensorName();
 
                 var message = new MqttApplicationMessageBuilder()
