@@ -12,33 +12,34 @@ namespace Client.Drone
     {
         static public void doWork(object parameters)
         {
-            //extract id and protocols from dictionary
+            //extract id, protocol and sensors from dictionary
             Dictionary<string, object> dict = (Dictionary<string, object>)parameters;
             string droneID = (string) dict["droneID"];
             ProtocolInterface protocol = (ProtocolInterface) dict["protocol"];
+            List<SensorInterface> sensors = (List<SensorInterface>) dict["sensors"];
 
-            // init sensors
-            List<SensorInterface> sensors = new List<SensorInterface>
-            {
-                new Timestamp(),
-                new VirtualSpeedSensor(),
-                new VirtualGPSSensor(),
-                new VirtualAltitudeSensor(),
-                new VirtualOrientation(),
-                new VirtualBattery()
-            };
-
-            // send data to server
+            // read and send data
             while (true)
             {
+                //dictionary that has sensor name as key and string of sensor value as value
+                Dictionary<string, string> sensors_data = new Dictionary<string, string>();
+
+                //read data from sensors
+                foreach(SensorInterface sensor in sensors) {
+                    //read value as a string -> 'sensorname': value
+                    sensors_data[sensor.getSensorName()] = sensor.toJson();
+                }
+
                 try
                 {
-                    protocol.Send(droneID, sensors);
+                    //send data with protocol
+                    protocol.Send(droneID, sensors_data);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Sending error: " + ex);
                 }
+                //sleep 1 second
                 System.Threading.Thread.Sleep(1000);
             }
         }

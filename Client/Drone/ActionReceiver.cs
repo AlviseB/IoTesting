@@ -16,6 +16,7 @@ namespace Client.Drone
             string droneID = (string)dict["droneID"];
             ProtocolInterface protocol = (ProtocolInterface)dict["protocol"];
 
+            //call received protocol method
             protocol.Received(droneID);
         }
     }

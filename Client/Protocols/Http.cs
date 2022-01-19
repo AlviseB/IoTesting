@@ -4,7 +4,6 @@ using System.Net;
 using System.IO;
 using Client.Sensors;
 using Client.JSON;
-using Newtonsoft.Json;
 
 namespace Client.Protocols
 {
@@ -18,13 +17,14 @@ namespace Client.Protocols
             this.endpoint = endpoint;
         }
 
-        public void Send(string droneID, List<SensorInterface> sensors)
+        public void Send(string droneID, Dictionary<string, string> sensors)
         {
             httpWebRequest = (HttpWebRequest)WebRequest.Create(endpoint + "/drones");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
-            string data = JsonManager.getJsonString(droneID, sensors);
+            //assemble sensors data in a single json string
+            string data = JsonManager.assembleJSON(droneID, sensors);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
@@ -57,8 +57,8 @@ namespace Client.Protocols
                 //deserialize and print 
                 try
                 {
-                    Dictionary<string, string> action = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    Console.WriteLine("Command : " + action["command"]);
+                    string command = JsonManager.deserializeCommand(json);
+                    Console.WriteLine("Command : " + command);
                 }
                 catch (Exception ex)
                 {
