@@ -24,7 +24,7 @@ namespace Client
 
             // define CoAP protocol
             ProtocolInterface sender_protocol = new CoAP("localhost");
-            //ProtocolInterface receiver_protocol = new CoAP("localhost");
+            ProtocolInterface receiver_protocol = new CoAP("localhost");
 
             //create thread parameter
             Dictionary<string, object> parameter = new Dictionary<string, object>
@@ -39,10 +39,10 @@ namespace Client
 
             Thread.Sleep(100);
 
-            /*parameter["protocol"] = receiver_protocol;
+            parameter["protocol"] = receiver_protocol;
             //thread for receive action data
             Thread receiverThread = new Thread(ActionReceiver.doWork);
-            receiverThread.Start(parameter);*/
+            receiverThread.Start(parameter);
 
         }
 
