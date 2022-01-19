@@ -1,6 +1,6 @@
-const restify = require("restify");
-const morgan = require("morgan");
-const droneController = require("./src/api/drone/drone.controller");
+const sensorModel = require("./src/api/sensor/sensor.model");
+
+let subscriptions = [];
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/HTTPDrone", {
@@ -8,25 +8,48 @@ mongoose.connect("mongodb://localhost:27017/HTTPDrone", {
   useUnifiedTopology: true,
 });
 
-var server = restify.createServer();
-server.use(restify.plugins.bodyParser());
-server.use(morgan("tiny"));
+const mqtt = require('mqtt')
+const client = mqtt.connect('mqtt://test.mosquitto.org')
 
-server.get("/drones", droneController.getAll);
+const root = "iot2021";
+const version = "v1";
+const zone = "thiene";
 
-server.get("/drones/:id", droneController.getOne);
+client.on('connect', function () {
+  let topic = `${root}/${version}/${zone}/+/status/#`;
+  client.subscribe(topic, function (err) {
+    subscriptions.push(topic)
+    console.log("subscribed to #");
+  })
+})
 
-server.get("/drones/:id/action", droneController.getAction);
+client.on('message', async function (topic, message) {
+  // message is Buffer
+  let [root, version, zone, droneID, status, sensorType] = topic.split("/");
+  console.log(message.toString());
+  data = JSON.parse(message.toString());
+  sensorData = {};
+  sensorData.droneID = droneID;
+  sensorData.timestamp = (new Date()).toUTCString();
+  sensorData.sensorType = sensorType;
+  sensorData.value = data[sensorType];
+  console.log(sensorData);
+  res = await sensorModel.create(sensorData);
+  console.log("Added: ", res);
+})
 
-server.post("/drones/:id/action", droneController.postAction);
+setInterval(() => {
+  const drone = "dr1_42"
+  client.publish(`${root}/${version}/${zone}/${drone}/command`, '{"command": "none"}')
 
-server.post("/drones", droneController.post);
+}, 1000);
 
-server.on("restifyError", function (req, res, err, callback) {
-  // this will get fired first, as it's the most relevant listener
-  return callback();
-});
 
-server.listen(8011, function () {
-  console.log("%s listening at %s", server.name, server.url);
+process.on('SIGINT', function () {
+  console.log('Unsubscribing...');
+  console.log(subscriptions.length);
+  subscriptions.forEach((sub) => client.unsubscribe(sub))
+  client.end();
+  console.log("Exited.");
+  process.exit();
 });
