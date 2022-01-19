@@ -11,7 +11,7 @@ mongoose.connect("mongodb://localhost:27017/HTTPDrone", {
 
 const amqp = require('amqplib/callback_api');
 
-amqp.connect('amqps://kxbxxcqx:IqK-VIirhbu-Gmil2bED0EsPXUxfeaa2@goose.rmq2.cloudamqp.com/kxbxxcqx', function (error0, connection) {
+amqp.connect(/* look at environment */'', function (error0, connection) {
     if (error0) {
         throw error0;
     }
