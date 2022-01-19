@@ -13,19 +13,25 @@ const coap = require('coap')
 const bl = require('bl')
 
 coap.createServer((req, res) => {
-    path = req.url.split("/")
-    console.log(path)
-    if (path[1] == "drones") {
-        req.pipe(bl((err, data) => {
-            if (err != null) {
-                process.exit(1)
-            } else {
-                const json = JSON.parse(data)
-                drone = droneModel.create(json)
-                console.log("created ", drone)
-            }
-        }))
-        res.end()
+    console.log("fuck me")
+    path = req.url.split("/");
+    [_, root, droneID, endpoint] = path;
+    method = req.method
+    if (root == "drones")
+        if (method == "POST") {
+            req.pipe(bl((err, data) => {
+                if (err != null) {
+                    process.exit(1)
+                } else {
+                    const json = JSON.parse(data)
+                    drone = droneModel.create(json)
+                    console.log("created ", drone)
+                }
+            }))
+            res.end()
+        }
+    if (method == "GET" && endpoint == "action") {
+        res.end('{"command": "hold"}')
     }
 }).listen(() => console.log("Running")/*{
     coap
