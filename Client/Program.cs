@@ -19,8 +19,12 @@ namespace Client
             //ProtocolInterface receiver_protocol = new Http("http://10.30.134.34:8011");
 
             // define MQTT protocol
-            ProtocolInterface sender_protocol = new MQTT("test.mosquitto.org");
-            ProtocolInterface receiver_protocol = new MQTT("test.mosquitto.org");
+            //ProtocolInterface sender_protocol = new MQTT("test.mosquitto.org");
+            //ProtocolInterface receiver_protocol = new MQTT("test.mosquitto.org");
+
+            // define CoAP protocol
+            ProtocolInterface sender_protocol = new CoAP("localhost");
+            ProtocolInterface receiver_protocol = new CoAP("localhost");
 
             //create thread parameter
             Dictionary<string, object> parameter = new Dictionary<string, object>

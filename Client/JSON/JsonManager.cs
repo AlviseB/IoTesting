@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Client.Sensors;
+using Newtonsoft.Json;
 
 namespace Client.JSON
 {
@@ -24,6 +25,12 @@ namespace Client.JSON
             json += '}';
 
             return json;
+        }
+
+        static public string deserializeCommand(string json)
+        {
+            Dictionary<string, string> action = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            return action["command"];
         }
     }
 }
