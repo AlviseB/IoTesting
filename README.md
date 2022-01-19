@@ -73,5 +73,6 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   
   ### Endpoints CoAP
   `POST /drones` Inserisce un nuovo record contenente i dati dei sensori relativi al drone che li invia
+  
   `GET /drones/:ID/action` Restituisce la prossima azione da eseguire per il drone identificato da *ID*
   
