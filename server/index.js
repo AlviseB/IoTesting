@@ -31,6 +31,7 @@ coap.createServer((req, res) => {
             res.end()
         }
     if (method == "GET" && endpoint == "action") {
+        console.log("sent command to drone:", droneID)
         res.end('{"command": "hold"}')
     }
 }).listen(() => console.log("Running")/*{
