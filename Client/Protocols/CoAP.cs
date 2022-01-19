@@ -51,35 +51,40 @@ namespace Client.Protocols
 
         public async void Received(string droneID)
         {
-            try
+            while (true)
             {
-                var message = new CoapMessage
+                try
                 {
-                    Code = CoapMessageCode.Get,
-                    Type = CoapMessageType.Confirmable,
-                };
+                    var message = new CoapMessage
+                    {
+                        Code = CoapMessageCode.Get,
+                        Type = CoapMessageType.Confirmable,
+                    };
 
-                // Get the /hello resource from localhost.
-                message.SetUri("coap://" + endpoint + "/drones/"+droneID+"/action");
+                    // Get the /hello resource from localhost.
+                    message.SetUri("coap://" + endpoint + "/drones/" + droneID + "/action");
 
-                Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");
-                await client.SendAsync(message, cancellationTokenSource.Token);
+                    Console.WriteLine($"Sending a {message.Code} {message.GetUri().GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped)} request");
+                    await client.SendAsync(message, cancellationTokenSource.Token);
 
-                // Wait for the server to respond.
-                var response = await client.ReceiveAsync(cancellationTokenSource.Token);
+                    // Wait for the server to respond.
+                    var response = await client.ReceiveAsync(cancellationTokenSource.Token);
 
-                string payload = Encoding.UTF8.GetString(response.Message.Payload);
+                    string payload = Encoding.UTF8.GetString(response.Message.Payload);
 
-                string command = JsonManager.deserializeCommand(payload);
-                Console.WriteLine("Command : " + command);
+                    string command = JsonManager.deserializeCommand(payload);
+                    Console.WriteLine("Command : " + command);
 
 
-                // Output our response
-                Console.WriteLine($"Received a command from {response.Endpoint}\n{Encoding.UTF8.GetString(response.Message.Payload)}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception caught: {ex}");
+                    // Output our response
+                    Console.WriteLine($"Received a command from {response.Endpoint}\n{Encoding.UTF8.GetString(response.Message.Payload)}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception caught: {ex}");
+                }
+
+                Thread.Sleep(1000);
             }
         }
     }
