@@ -86,3 +86,11 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   Descrizione dei metodi utilizzati dal protocollo AMQP:
   - *publish*, i comandi vengono pubblicati sul **topic exchange** *AMQP-DRONE*  come un'**unica stringa in formato JSON** .
   - *consume*, il server consuma i messaggi pubblicati sulla coda *server*.
+
+---
+
+## Sicurezza - accenni
+Non sono stati implementati metodi per rendere la comunicazione tra drone e server sicura, tuttavia presentiamo in modo coinciso le soluzioni che avremmo potuto adottare in un contesto reale.
+A **livello di rete** la soluzione ottimale è quella di comunicare su una **rete sicura**, tuttavia per il drone che comunica con il server attraverso internet, questo non è praticabile. Per i protocolli **client-server** è possibile utilizzare una **VPN** per creare un canale di comunicazione sicuro.
+A **livello di trasporto** la comunicazione andrebbe cifrata con **TLS/SSL** (o DTLS per il protocollo CoAP), utilizzando i **certificati**. 
+A livello applicativo si prevedrebbe l'**autenticazione** sul server o sul broker mediante l'utilizzo di **username e password** o in alternativa di un **token**. Se la protezione ai livelli inferiori non fosse praticabile, sarebbe necessario **criptare** i messaggi/payloads, ma a causa delle risorse limitate del drone e in assenza di un dispositivo di **edge** l'algoritmo di cifratura dovrebbe essere computazionalmente poco dispendioso.
