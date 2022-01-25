@@ -82,3 +82,7 @@ La scelta del database MongoDB è dipesa dalle tempistiche di sviluppo e da prob
   
   `GET /drones/:ID/action` Restituisce la prossima azione da eseguire per il drone identificato da *ID*
   
+  ### AMQP
+  Descrizione dei metodi utilizzati dal protocollo AMQP:
+  - *publish*, i comandi vengono pubblicati sul **topic exchange** *AMQP-DRONE*  come un'**unica stringa in formato JSON** .
+  - *consume*, il server consuma i messaggi pubblicati sulla coda *server*.

@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start_HTTP": "node index_HTTP.js",
+    "start_MQTT": "node index_MQTT.js",
+    "start_COAP": "node index_COAP.js",
+    "start_AMQP": "node index_AMQP.js"
   },
   "author": "",
   "license": "ISC",
