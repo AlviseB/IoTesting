@@ -8,7 +8,7 @@
     "start_HTTP": "node index_HTTP.js",
     "start_MQTT": "node index_MQTT.js",
     "start_COAP": "node index_COAP.js",
-    "start_AMQP": "node index_AMQP.js"
+    "start_AMQP": "node -r dotenv/config index_AMQP.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "amqplib": "^0.8.0",
     "bl": "^5.0.0",
     "coap": "^1.0.2",
+    "dotenv": "^14.3.0",
     "mongoose": "^6.1.3",
     "mqtt": "^4.3.4",
     "mssql": "^7.3.0",

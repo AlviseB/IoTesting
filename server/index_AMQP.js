@@ -11,7 +11,7 @@ mongoose.connect("mongodb://localhost:27017/HTTPDrone", {
 
 const amqp = require('amqplib/callback_api');
 
-amqp.connect(/* look at environment */'', function (error0, connection) {
+amqp.connect(process.env.AMQP, function (error0, connection) {
     if (error0) {
         throw error0;
     }
@@ -19,17 +19,23 @@ amqp.connect(/* look at environment */'', function (error0, connection) {
         if (error1) {
             throw error1;
         }
+        //topic exchange for drones
+        let droneExchange = "AMQP-DRONE";
+        //drone queue example
+        let queue = "dr1_42"
 
-        exchange = "AMQP-DRONE";
-        queue = "dr1_42"
-
-        channel.assertExchange(exchange, 'topic')
+        channel.assertExchange(droneExchange, 'topic')
         channel.assertQueue(queue);
-        channel.bindQueue(queue, exchange, `${queue}.#`);
+        channel.bindQueue(queue, droneExchange, `${queue}.#`);
 
-        channel.assertQueue("server");
-        channel.assertExchange("AMQP-SERVER", 'direct')
-        channel.bindQueue("server", "AMQP-SERVER");
+
+        //direct exchange for server
+        let serverExchange = "AMQP-SERVER"
+        //server queue
+        let serverQueue = "server"
+        channel.assertQueue(serverQueue);
+        channel.assertExchange(serverExchange, 'direct')
+        channel.bindQueue(serverQueue, serverExchange);
 
 
         setInterval(() => {
@@ -37,7 +43,7 @@ amqp.connect(/* look at environment */'', function (error0, connection) {
             channel.publish("AMQP-DRONE", `${drone}.command`, Buffer.from('{"command": "hold"}'))
         }, 5000);
 
-            console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
+        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
         channel.consume("server", function (msg) {
             drone = JSON.parse(msg.content);
             droneModel.create(drone).then((v) => console.log(v))
@@ -47,38 +53,3 @@ amqp.connect(/* look at environment */'', function (error0, connection) {
         });
     });
 });
-
-/*
-const root = "iot2021";
-const version = "v1";
-const zone = "thiene";
-
-client.on('connect', function () {
-  let topic = `${root}/${version}/${zone}/+/status/#`;
-  client.subscribe(topic, function (err) {
-    subscriptions.push(topic)
-    console.log("subscribed to #");
-  })
-})
-
-client.on('message', async function (topic, message) {
-  // message is Buffer
-  let [root, version, zone, droneID, status, sensorType] = topic.split("/");
-  console.log(message.toString());
-  data = JSON.parse(message.toString());
-  sensorData = {};
-  sensorData.droneID = droneID;
-  sensorData.timestamp = (new Date()).toUTCString();
-  sensorData.sensorType = sensorType;
-  sensorData.value = data[sensorType];
-  console.log(sensorData);
-  res = await sensorModel.create(sensorData);
-  console.log("Added: ", res);
-})
-
-setInterval(() => {
-  const drone = "dr1_42"
-  client.publish(`${root}/${version}/${zone}/${drone}/command`, '{"command": "none"}')
-
-}, 1000);*/
-
